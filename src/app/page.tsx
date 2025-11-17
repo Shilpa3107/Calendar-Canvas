@@ -2,9 +2,9 @@
 
 import { CalendarView } from "@/components/Calendar/CalendarView";
 import { CalendarEvent } from "@/components/Calendar/CalendarView.types";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-const sampleEvents: CalendarEvent[] = [
+const createSampleEvents = (): CalendarEvent[] => [
   {
     id: 'evt-1',
     title: 'Team Standup',
@@ -44,7 +44,11 @@ const sampleEvents: CalendarEvent[] = [
 
 
 export default function Home() {
-  const [events, setEvents] = useState<CalendarEvent[]>(sampleEvents);
+  const [events, setEvents] = useState<CalendarEvent[]>([]);
+
+  useEffect(() => {
+    setEvents(createSampleEvents());
+  }, []);
 
   const handleAdd = (event: Omit<CalendarEvent, 'id'>) => {
     const newEvent: CalendarEvent = {
