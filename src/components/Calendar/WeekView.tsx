@@ -167,7 +167,7 @@ export const WeekView: React.FC<WeekViewProps> = ({
                       style={{ 
                           top: `${pos.top}rem`, 
                           height: `${pos.height}rem`,
-                          backgroundColor: event.color
+                          backgroundColor: event.color || '#3b82f6'
                       }}
                       onClick={() => onEventClick(event)}
                     >
