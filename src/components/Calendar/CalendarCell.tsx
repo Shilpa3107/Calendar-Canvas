@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { format, isToday, isSameMonth } from '@/utils/date-utils';
 import { CalendarEvent } from './CalendarView.types';
@@ -27,8 +27,14 @@ export const CalendarCell: React.FC<CalendarCellProps> = React.memo(({
   onShowMoreClick,
   onEventDrop
 }) => {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   const isCurrentMonth = isSameMonth(date, currentMonth);
-  const isTodayDate = isToday(date);
+  const isTodayDate = isClient && isToday(date);
 
   const handleCellClick = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
