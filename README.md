@@ -4,7 +4,7 @@ A feature-rich, interactive calendar component built with modern web technologie
 
 ## Live Storybook
 
-[Link to your deployed Storybook instance will go here]
+https://calendar-canvas.vercel.app/
 
 ## Installation
 
