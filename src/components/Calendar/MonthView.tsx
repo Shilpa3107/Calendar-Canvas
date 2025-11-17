@@ -10,11 +10,12 @@ interface MonthViewProps {
   events: CalendarEvent[];
   onDayClick: (date: Date) => void;
   onEventClick: (event: CalendarEvent) => void;
+  onEventDrop: (eventId: string, newDate: Date) => void;
 }
 
-export const MonthView: React.FC<MonthViewProps> = ({ currentDate, events, onDayClick, onEventClick }) => {
+export const MonthView: React.FC<MonthViewProps> = ({ currentDate, events, onDayClick, onEventClick, onEventDrop }) => {
   const grid = getCalendarGrid(currentDate);
-  const weekDays = Array.from({ length: 7 }, (_, i) => format(startOfWeek(new Date(), { weekStartsOn: i }), 'EEEE'));
+  const weekDays = Array.from({ length: 7 }, (_, i) => format(startOfWeek(new Date(), { weekStartsOn: 0 }), 'EEEE'));
 
   const getEventsForDay = (day: Date) => {
     return events.filter(event => 
@@ -25,8 +26,7 @@ export const MonthView: React.FC<MonthViewProps> = ({ currentDate, events, onDay
   };
 
   const handleShowMore = (date: Date) => {
-    // In a real app, this could open a modal or navigate to a day view
-    console.log("Show more events for", date);
+    // This could open a modal or navigate to a day view
     onDayClick(date);
   }
 
@@ -50,6 +50,7 @@ export const MonthView: React.FC<MonthViewProps> = ({ currentDate, events, onDay
             onClick={onDayClick}
             onEventClick={onEventClick}
             onShowMoreClick={handleShowMore}
+            onEventDrop={onEventDrop}
           />
         ))}
       </div>

@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from 'react';
-import { CalendarViewProps, CalendarEvent, CalendarViewType } from './CalendarView.types';
+import React, { useState, useCallback } from 'react';
+import { CalendarViewProps, CalendarEvent } from './CalendarView.types';
 import { useCalendar } from '@/hooks/useCalendar';
 import { useEventManager } from '@/hooks/useEventManager';
 import { CalendarHeader } from './CalendarHeader';
@@ -9,6 +9,8 @@ import { MonthView } from './MonthView';
 import { WeekView } from './WeekView';
 import { EventModal } from './EventModal';
 import { cn } from '@/lib/utils';
+import { addDate } from '@/utils/date-utils';
+import toast from 'react-hot-toast';
 
 export const CalendarView: React.FC<CalendarViewProps> = ({
   events: initialEvents,
@@ -28,13 +30,13 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
     setDate
   } = useCalendar(initialDate, initialView);
 
-  const { events, addEvent, updateEvent, deleteEvent } = useEventManager(initialEvents);
+  const { events, addEvent, updateEvent, deleteEvent, findEvent } = useEventManager(initialEvents);
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Partial<CalendarEvent> | null>(null);
 
   const handleDayClick = (date: Date) => {
-    setSelectedEvent({ startDate: date, endDate: date });
+    setSelectedEvent({ startDate: date, endDate: addDate(date, { hours: 1 }) });
     setIsModalOpen(true);
   };
 
@@ -50,18 +52,32 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
 
   const handleSaveEvent = (eventData: Omit<CalendarEvent, 'id'>) => {
     const newEvent = addEvent(eventData);
-    onEventAdd(newEvent);
+    if(onEventAdd) onEventAdd(newEvent);
   };
 
   const handleUpdateEvent = (id: string, updates: Partial<CalendarEvent>) => {
     updateEvent(id, updates);
-    onEventUpdate(id, updates);
+    if(onEventUpdate) onEventUpdate(id, updates);
   };
   
   const handleDeleteEvent = (id: string) => {
     deleteEvent(id);
-    onEventDelete(id);
+    if(onEventDelete) onEventDelete(id);
   };
+
+  const handleEventDrop = useCallback((eventId: string, newDate: Date) => {
+    const event = findEvent(eventId);
+    if (!event) return;
+
+    const duration = event.endDate.getTime() - event.startDate.getTime();
+    const newStartDate = new Date(newDate);
+    newStartDate.setHours(event.startDate.getHours(), event.startDate.getMinutes());
+    
+    const newEndDate = new Date(newStartDate.getTime() + duration);
+
+    handleUpdateEvent(eventId, { startDate: newStartDate, endDate: newEndDate });
+    toast.success(`Moved "${event.title}"`);
+  }, [findEvent]);
 
   return (
     <div className="bg-white rounded-xl shadow-card w-full h-[95vh] flex flex-col">
@@ -81,6 +97,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
           events={events}
           onDayClick={handleDayClick}
           onEventClick={handleEventClick}
+          onEventDrop={handleEventDrop}
         />
       ) : (
         <WeekView 
@@ -88,6 +105,8 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
           events={events} 
           onEventClick={handleEventClick}
           onSlotClick={handleDayClick}
+          onEventDrop={handleEventDrop}
+          onEventAdd={handleSaveEvent}
         />
       )}
 

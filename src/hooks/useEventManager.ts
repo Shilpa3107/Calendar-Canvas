@@ -27,6 +27,10 @@ export const useEventManager = (initialEvents: CalendarEvent[] = []) => {
     setEvents(prev => prev.filter(event => event.id !== id));
   }, []);
 
+  const findEvent = useCallback((id: string) => {
+    return events.find(event => event.id === id);
+  }, [events]);
+
   const getEventsForDay = useCallback((date: Date) => {
     return events
       .filter(event => 
@@ -43,5 +47,6 @@ export const useEventManager = (initialEvents: CalendarEvent[] = []) => {
     updateEvent,
     deleteEvent,
     getEventsForDay,
+    findEvent,
   };
 };
