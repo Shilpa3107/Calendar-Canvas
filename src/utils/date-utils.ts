@@ -27,20 +27,18 @@ export const isSameDay = (date1: Date, date2: Date): boolean => {
  * Gets the calendar grid (42 cells for month view)
  */
 export const getCalendarGrid = (date: Date): Date[] => {
-  const firstDayOfMonth = startOfMonth(date);
-  const lastDayOfMonth = endOfMonth(date);
+  const year = date.getFullYear();
+  const month = date.getMonth();
+  const firstDay = new Date(year, month, 1);
 
-  const startDayOfGrid = startOfWeek(firstDayOfMonth);
-  const endDayOfGrid = endOfWeek(add(lastDayOfMonth, { days: 42 - eachDayOfInterval({start: startDayOfGrid, end: lastDayOfMonth}).length}));
-  
-  // Ensure we always have 42 days (6 weeks)
+  const startDay = startOfWeek(firstDay);
+
   const grid: Date[] = [];
-  let day = startDayOfGrid;
-  while(grid.length < 42){
-      grid.push(day);
-      day = add(day, {days: 1});
+  let currentDay = startDay;
+  for (let i = 0; i < 42; i++) {
+    grid.push(new Date(currentDay));
+    currentDay.setDate(currentDay.getDate() + 1);
   }
-
   return grid;
 };
 
