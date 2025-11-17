@@ -1,70 +1,113 @@
-{
-  "name": "nextn",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "dev": "next dev --turbopack -p 9002",
-    "genkit:dev": "genkit start -- tsx src/ai/dev.ts",
-    "genkit:watch": "genkit start -- tsx --watch src/ai/dev.ts",
-    "build": "NODE_ENV=production next build",
-    "start": "next start",
-    "lint": "next lint",
-    "typecheck": "tsc --noEmit",
-    "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+import type { Meta, StoryObj } from '@storybook/react';
+import { CalendarView } from './CalendarView';
+import { CalendarEvent } from './CalendarView.types';
+
+const meta: Meta<typeof CalendarView> = {
+  title: 'Components/CalendarView',
+  component: CalendarView,
+  parameters: {
+    layout: 'fullscreen',
   },
-  "dependencies": {
-    "@genkit-ai/google-genai": "^1.20.0",
-    "@genkit-ai/next": "^1.20.0",
-    "@hookform/resolvers": "^4.1.3",
-    "@radix-ui/react-accordion": "^1.2.3",
-    "@radix-ui/react-alert-dialog": "^1.1.6",
-    "@radix-ui/react-avatar": "^1.1.3",
-    "@radix-ui/react-checkbox": "^1.1.4",
-    "@radix-ui/react-collapsible": "^1.1.11",
-    "@radix-ui/react-dialog": "^1.1.6",
-    "@radix-ui/react-dropdown-menu": "^2.1.6",
-    "@radix-ui/react-label": "^2.1.2",
-    "@radix-ui/react-menubar": "^1.1.6",
-    "@radix-ui/react-popover": "^1.1.6",
-    "@radix-ui/react-progress": "^1.1.2",
-    "@radix-ui/react-radio-group": "^1.2.3",
-    "@radix-ui/react-scroll-area": "^1.2.3",
-    "@radix-ui/react-select": "^2.1.6",
-    "@radix-ui/react-separator": "^1.1.2",
-    "@radix-ui/react-slider": "^1.2.3",
-    "@radix-ui/react-slot": "^1.2.3",
-    "@radix-ui/react-switch": "^1.1.3",
-    "@radix-ui/react-tabs": "^1.1.3",
-    "@radix-ui/react-toast": "^1.2.6",
-    "@radix-ui/react-tooltip": "^1.1.8",
-    "class-variance-authority": "^0.7.1",
-    "clsx": "^2.1.1",
-    "date-fns": "^3.6.0",
-    "dotenv": "^16.5.0",
-    "embla-carousel-react": "^8.6.0",
-    "firebase": "^11.9.1",
-    "genkit": "^1.20.0",
-    "lucide-react": "^0.475.0",
-    "next": "15.3.3",
-    "patch-package": "^8.0.0",
-    "react": "^18.3.1",
-    "react-day-picker": "^8.10.1",
-    "react-dom": "^18.3.1",
-    "react-hook-form": "^7.54.2",
-    "react-hot-toast": "^2.4.1",
-    "recharts": "^2.15.1",
-    "tailwind-merge": "^3.0.1",
-    "tailwindcss-animate": "^1.0.7",
-    "zod": "^3.24.2"
+  tags: ['autodocs'],
+};
+
+export default meta;
+type Story = StoryObj<typeof CalendarView>;
+
+const sampleEvents: CalendarEvent[] = [
+  {
+    id: 'evt-1',
+    title: 'Team Standup',
+    description: 'Daily sync with the team',
+    startDate: new Date(new Date().setHours(9, 0, 0, 0)),
+    endDate: new Date(new Date().setHours(9, 30, 0, 0)),
+    color: '#3b82f6',
+    category: 'Meeting',
   },
-  "devDependencies": {
-    "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
-    "genkit-cli": "^1.20.0",
-    "postcss": "^8",
-    "tailwindcss": "^3.4.1",
-    "typescript": "^5"
+  {
+    id: 'evt-2',
+    title: 'Design Review',
+    description: 'Review new component designs',
+    startDate: new Date(new Date().setHours(14, 0, 0, 0)),
+    endDate: new Date(new Date().setHours(15, 30, 0, 0)),
+    color: '#10b981',
+    category: 'Design',
+  },
+  {
+    id: 'evt-3',
+    title: 'Client Presentation',
+    startDate: new Date(new Date(new Date().setDate(new Date().getDate() + 1)).setHours(10, 0, 0, 0)),
+    endDate: new Date(new Date(new Date().setDate(new Date().getDate() + 1)).setHours(11, 30, 0, 0)),
+    color: '#f59e0b',
+    category: 'Meeting',
+  },
+];
+
+const manyEvents: CalendarEvent[] = [
+  ...sampleEvents,
+  ...Array.from({ length: 20 }, (_, i) => ({
+    id: `evt-many-${i}`,
+    title: `Event ${i + 4}`,
+    startDate: new Date(new Date(new Date().setDate(i + 2)).setHours(Math.random() * 20, 0, 0, 0)),
+    endDate: new Date(new Date(new Date().setDate(i + 2)).setHours(Math.random() * 20 + 1, 0, 0, 0)),
+    color: ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444'][i % 5],
+  }))
+];
+
+const logEvent = (name: string) => (...args: any[]) => console.log(name, ...args);
+
+export const Default: Story = {
+  args: {
+    events: sampleEvents,
+    onEventAdd: logEvent('onEventAdd'),
+    onEventUpdate: logEvent('onEventUpdate'),
+    onEventDelete: logEvent('onEventDelete'),
+  },
+};
+
+export const EmptyState: Story = {
+  args: {
+    ...Default.args,
+    events: [],
+  },
+};
+
+export const WeekView: Story = {
+  args: {
+    ...Default.args,
+    initialView: 'week',
+  },
+};
+
+export const WithManyEvents: Story = {
+  args: {
+    ...Default.args,
+    events: manyEvents,
+  },
+};
+
+export const InteractiveDemo: Story = {
+  render: () => {
+    const [events, setEvents] = React.useState<CalendarEvent[]>(sampleEvents);
+
+    const handleAdd = (event: Omit<CalendarEvent, 'id'>) => {
+      const newEvent: CalendarEvent = { ...event, id: `evt-${Date.now()}` };
+      setEvents(prev => [...prev, newEvent]);
+    };
+    const handleUpdate = (id: string, updates: Partial<CalendarEvent>) => {
+      setEvents(prev => prev.map(e => e.id === id ? { ...e, ...updates } : e));
+    };
+    const handleDelete = (id: string) => {
+      setEvents(prev => prev.filter(e => e.id !== id));
+    };
+
+    return (
+      <CalendarView
+        events={events}
+        onEventAdd={handleAdd}
+        onEventUpdate={handleUpdate}
+        onEventDelete={handleDelete}
+      />
+    );
   }
-}
+};
