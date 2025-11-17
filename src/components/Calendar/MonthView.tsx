@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { getCalendarGrid, format, startOfWeek } from '@/utils/date-utils';
+import { getCalendarGrid, format, addDate, startOfWeek } from '@/utils/date-utils';
 import { CalendarCell } from './CalendarCell';
 import { CalendarEvent } from './CalendarView.types';
 
@@ -15,7 +15,10 @@ interface MonthViewProps {
 
 export const MonthView: React.FC<MonthViewProps> = ({ currentDate, events, onDayClick, onEventClick, onEventDrop }) => {
   const grid = getCalendarGrid(currentDate);
-  const weekDays = Array.from({ length: 7 }, (_, i) => format(startOfWeek(new Date(), { weekStartsOn: 0 }), 'EEEE'));
+  const weekStartsOn = 0; // Sunday
+  const weekStart = startOfWeek(new Date(), { weekStartsOn });
+  const weekDays = Array.from({ length: 7 }, (_, i) => format(addDate(weekStart, { days: i }), 'EEEE'));
+
 
   const getEventsForDay = (day: Date) => {
     return events.filter(event => 
@@ -33,8 +36,8 @@ export const MonthView: React.FC<MonthViewProps> = ({ currentDate, events, onDay
   return (
     <div className="flex-grow flex flex-col">
       <div className="grid grid-cols-7 border-r border-b border-neutral-200">
-        {weekDays.map(day => (
-          <div key={day} className="text-center py-2 text-sm font-medium text-neutral-700 border-t border-l border-neutral-200 bg-neutral-50">
+        {weekDays.map((day, index) => (
+          <div key={`${day}-${index}`} className="text-center py-2 text-sm font-medium text-neutral-700 border-t border-l border-neutral-200 bg-neutral-50">
             <span className="hidden md:inline">{day}</span>
             <span className="md:hidden">{day.substring(0,3)}</span>
           </div>
